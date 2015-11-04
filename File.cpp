@@ -2,7 +2,7 @@
 
 bool File::reading() {
     fstream file;
-    file.open( "OK/test1.txt" );
+    file.open( "Files/test1.txt" );
     if( !file.good() )
         return false;
     while ( !file.eof() ) {
