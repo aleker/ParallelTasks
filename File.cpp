@@ -22,22 +22,35 @@ bool File::reading() {
             cout << "maxProcs and maxNodes = " << maxProcs << endl;
         }
         else if (row.substr(0,1) != ";"){
-            for(char c : row){
-                if(isdigit(c) && flag < 6){
+            const char * tab = row.c_str();
+            for(int i=0; i <= row.length(); i++){
+                if(isdigit(tab[i]) && flag<=6){
                     flag++;
+                    string number;
+                    do{
+                        number+=tab[i];
+                        i++;
+                    }while(tab[i]!=' ');
+
                     switch(flag){
                         case 1:
-                            cout << setw(10) << "id : " << c << " | " ;
+                            cout << setw(10) << "id : " << stoi(number) << " | " ;
                             break;
                         case 2:
-                            cout << setw(10) << "standby time : " << c << " | ";
+                            cout << setw(10) << "standby time : " << stoi(number) << " | ";
                             break;
                         case 4:
-                            cout << setw(10) << "duration : " << c << " | ";
+                            cout << setw(10) << "duration : " << stoi(number) << " | ";
                             break;
                         case 5 :
-                            cout << setw(10) << "procs no. : " << c << " ";
+                            cout << setw(10) << "procs no. : " << stoi(number) << " ";
+                        case 6:
+                            flag=-1;
+                            break;
+
                     }
+                    if(flag == -1)
+                        break;
 
                 }
 

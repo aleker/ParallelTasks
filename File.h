@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <vector>
 #include <iomanip>
+#include <string.h>
 
 using namespace std;
 
