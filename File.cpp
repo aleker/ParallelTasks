@@ -6,6 +6,7 @@ bool File::reading() {
     if( !file.good() )
         return false;
     while ( !file.eof() ) {
+        int flag = 0;
         string row;
         getline( file, row);
         if (row.substr(0,11)=="; MaxJobs: ") {
@@ -21,8 +22,27 @@ bool File::reading() {
             cout << "maxProcs and maxNodes = " << maxProcs << endl;
         }
         else if (row.substr(0,1) != ";"){
-            //char* line = row.c_str();
+            for(char c : row){
+                if(isdigit(c) && flag < 6){
+                    flag++;
+                    switch(flag){
+                        case 1:
+                            cout << setw(10) << "id : " << c << " | " ;
+                            break;
+                        case 2:
+                            cout << setw(10) << "standby time : " << c << " | ";
+                            break;
+                        case 4:
+                            cout << setw(10) << "duration : " << c << " | ";
+                            break;
+                        case 5 :
+                            cout << setw(10) << "procs no. : " << c << " ";
+                    }
 
+                }
+
+            }
+            cout << endl;
         }
     }
 
