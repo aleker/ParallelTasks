@@ -16,7 +16,9 @@ public:
     int size_j; // liczba procesorów
 
     Process() { cout << "Process created!" << endl; };              //empty constructor
-    Process(int id, int r, int p, int size) : id(id), r_j(r), p_j(p), size_j(size) { cout << "Process created!" << endl; }
+    Process(int id, int r, int p, int size) : id(id), r_j(r), p_j(p), size_j(size) { cout << "Copy process created!" << endl; }
+    ~Process() { cout << "Process destructed!" << endl; }
+    void display();
 
 };
 

@@ -7,6 +7,7 @@
 #include <vector>
 #include <iomanip>
 #include <string.h>
+#include "Process.h"
 
 using namespace std;
 
@@ -18,9 +19,10 @@ public:
     int maxProcs;
     int maxNodes;
 
-    bool reading();
+    vector<Process> reading(string name_of_file, int task_amount);
 
     File() { cout << "File created!" << endl; }
+    ~File() { cout << "File destructed!" << endl;}
 };
 
 
