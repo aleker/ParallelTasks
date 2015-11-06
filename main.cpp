@@ -1,15 +1,12 @@
 #include <iostream>
-#include <ctime>
-#include <unistd.h>
 #include "Process.h"
 #include "File.h"
-
 
 using namespace std;
 
 int main(int argc, char* argv[]) {
 
-    clock_t beg_time = clock();
+    //clock_t beg_time = clock();
     vector<Process> processes_list;
     File file;
     string file_name = "Files/test3.txt";
@@ -33,12 +30,15 @@ int main(int argc, char* argv[]) {
     for (Process task: processes_list) {
         task.display();
     }
+    cout << endl;
+
+    file.parallelTask(processes_list);
 
     // DISPLAY TIME
-    sleep(10);
-    clock_t end_time = clock();
-    double duration = (end_time - beg_time )/(double) CLOCKS_PER_SEC;
-    cout << duration << endl;
+    //sleep(10);
+    //clock_t end_time = clock();
+    //double duration = (end_time - beg_time )/(double) CLOCKS_PER_SEC;
+    //cout << duration << endl;
 
     return 0;
 }

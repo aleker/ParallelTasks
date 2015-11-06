@@ -23,6 +23,8 @@ public:
 
     File() { cout << "File created!" << endl; }
     ~File() { cout << "File destructed!" << endl;}
+
+    void parallelTask(vector<Process> processes_list);
 };
 
 

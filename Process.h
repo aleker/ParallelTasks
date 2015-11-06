@@ -5,6 +5,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -14,10 +15,12 @@ public:
     int r_j;    // moment gotowosci przybycia, przybycia
     int p_j;    // czas trwania
     int size_j; // liczba procesorów
+    int f_t;    // finish time
 
-    Process() { cout << "Process created!" << endl; };              //empty constructor
-    Process(int id, int r, int p, int size) : id(id), r_j(r), p_j(p), size_j(size) { cout << "Copy process created!" << endl; }
-    ~Process() { cout << "Process destructed!" << endl; }
+    Process() { };              //empty constructor
+    Process(int id, int r, int p, int size) : id(id), r_j(r), p_j(p), size_j(size) { }
+    ~Process() { }
+
     void display();
 
 };
