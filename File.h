@@ -7,7 +7,10 @@
 #include <vector>
 #include <iomanip>
 #include <string.h>
+#include <array>
+#include <iostream>
 #include "Process.h"
+
 
 using namespace std;
 

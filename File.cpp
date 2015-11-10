@@ -90,22 +90,36 @@ void File::parallelTask(vector<Process> processes_list) {
     int free_proc = maxProcs;
     Process task;
     vector<Process> active_tasks;
+    bool *available_procs = new bool[maxProcs];
     int i = 0;
     int proc_num = i;
     bool flag;
 
     while ( !processes_list.empty()) {
         i = 0;
-        flag = true;       // to add more then one task in one clock_tick
+        flag = true;       // to add more than one task in one clock_tick
         //delete task;
         task.p_j = 0;
+        for(int j = 0 ; j < maxProcs ; j++)
+            available_procs[j] = 0;
+
+        // FREEING THE PROCESSORS WHEN TASK'S FINISHED
         while ( !active_tasks.empty() && active_tasks.front().f_t <= clock_tick){
             free_proc += active_tasks.front().size_j;
+
+            // cleaning the bool array of procs numbers
+            while(!active_tasks.front().procs_numbers.empty()) {
+                available_procs[active_tasks.front().procs_numbers.front()] = 0;
+                active_tasks.front().procs_numbers.erase(active_tasks.front().procs_numbers.begin());
+            }
             // dodawanie do pliku gdy wychodzi
             active_tasks.erase(active_tasks.begin());
         }
+
         while (free_proc > 0 && flag) {
             flag = false;
+
+            // CHOSING THE BEST TASK TO ALLOCATE
             while (( i < processes_list.size() ) && processes_list[i].r_j <= clock_tick ){
                 if ((task.p_j == 0 || processes_list[i].size_j > task.size_j) && processes_list[i].size_j <= free_proc) {
                     task = processes_list[i];
@@ -114,6 +128,8 @@ void File::parallelTask(vector<Process> processes_list) {
                 }
                 i++;
             }
+
+            // ALLOCATING THE TASK WHEN WE'VE GOT A CHOSEN ONE
             if (task.p_j != 0) {
                 task.f_t = clock_tick + task.p_j;
                 active_tasks.push_back(task);
@@ -123,6 +139,19 @@ void File::parallelTask(vector<Process> processes_list) {
                 sort(active_tasks.begin(), active_tasks.end(), myCmp2);
 
                 processes_list.erase(processes_list.begin()+proc_num);
+                // asigning processors numbers to a current task
+                int procs_needed = task.size_j;
+                for ( int j = 0; j < maxProcs ; j++){
+                    if(procs_needed != 0 && available_procs[j]==0) {
+                        available_procs[j] = 1;   //changing the status to "taken"
+                        procs_needed--;
+                        task.procs_numbers.push_back(j);
+                        cout << "proc : " << j << " ";
+                    }
+                }
+                cout << endl;
+
+
                 free_proc -= task.size_j;
                 // delete task
                 i = 0;
