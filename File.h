@@ -9,10 +9,12 @@
 #include <string.h>
 #include <array>
 #include <iostream>
+#include <fstream>
 #include "Process.h"
 
 
 using namespace std;
+
 
 class File {
 public:

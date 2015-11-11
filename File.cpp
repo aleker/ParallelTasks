@@ -94,6 +94,8 @@ void File::parallelTask(vector<Process> processes_list) {
     int i = 0;
     int proc_num = i;
     bool flag;
+    ofstream output;
+    output.open("output.txt");
 
     while ( !processes_list.empty()) {
         i = 0;
@@ -132,13 +134,6 @@ void File::parallelTask(vector<Process> processes_list) {
             // ALLOCATING THE TASK WHEN WE'VE GOT A CHOSEN ONE
             if (task.p_j != 0) {
                 task.f_t = clock_tick + task.p_j;
-                active_tasks.push_back(task);
-                // dodawanie do pliku  gdy wchodzi
-                task.display();
-                cout << "Clock " << clock_tick << endl;
-                sort(active_tasks.begin(), active_tasks.end(), myCmp2);
-
-                processes_list.erase(processes_list.begin()+proc_num);
                 // asigning processors numbers to a current task
                 int procs_needed = task.size_j;
                 for ( int j = 0; j < maxProcs ; j++){
@@ -146,11 +141,21 @@ void File::parallelTask(vector<Process> processes_list) {
                         available_procs[j] = 1;   //changing the status to "taken"
                         procs_needed--;
                         task.procs_numbers.push_back(j);
-                        cout << "proc : " << j << " ";
                     }
                 }
-                cout << endl;
 
+                active_tasks.push_back(task);
+                // dodawanie do pliku  gdy wchodzi
+                output << task.id << " " << task.f_t - task.p_j
+                        << " " << task.f_t << " ";
+                for(int j : task.procs_numbers)
+                    output << j << " ";
+                output << endl;
+                task.display();
+                cout << "Clock " << clock_tick << endl;
+
+                sort(active_tasks.begin(), active_tasks.end(), myCmp2);
+                processes_list.erase(processes_list.begin()+proc_num);
 
                 free_proc -= task.size_j;
                 // delete task
@@ -161,5 +166,5 @@ void File::parallelTask(vector<Process> processes_list) {
         }
     clock_tick ++;
     }
-
+output.close();
 }

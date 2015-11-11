@@ -9,6 +9,7 @@ int main(int argc, char* argv[]) {
     //clock_t beg_time = clock();
     vector<Process> processes_list;
     File file;
+
     string file_name = "Files/test3.txt";
     int tasks_amount = -1; //first n tasks
 
@@ -24,6 +25,7 @@ int main(int argc, char* argv[]) {
         tasks_amount = stoi(argv[2]);
         cout << "Tasks_amount = " << tasks_amount << endl;
     }
+
     processes_list = file.reading(file_name, tasks_amount);
 
     // DISPLAY LIST OF PROCESSES
@@ -31,6 +33,7 @@ int main(int argc, char* argv[]) {
         task.display();
     }
     cout << endl;
+
 
     file.parallelTask(processes_list);
 
