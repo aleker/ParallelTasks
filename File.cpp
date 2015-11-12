@@ -69,7 +69,8 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
                         case 6:
                             flag=-1;
                             break;
-
+                        default:
+                            break;
                     }
                     if(flag == -1)
                         break;
@@ -96,14 +97,14 @@ void File::parallelTask(vector<Process> processes_list) {
     bool flag;
     ofstream output;
     output.open("output.txt");
+    for(int j = 0 ; j < maxProcs ; j++)
+        available_procs[j] = 0;
 
     while ( !processes_list.empty()) {
         i = 0;
         flag = true;       // to add more than one task in one clock_tick
         //delete task;
         task.p_j = 0;
-        for(int j = 0 ; j < maxProcs ; j++)
-            available_procs[j] = 0;
 
         // FREEING THE PROCESSORS WHEN TASK'S FINISHED
         while ( !active_tasks.empty() && active_tasks.front().f_t <= clock_tick){
@@ -111,17 +112,16 @@ void File::parallelTask(vector<Process> processes_list) {
 
             // cleaning the bool array of procs numbers
             while(!active_tasks.front().procs_numbers.empty()) {
-                available_procs[active_tasks.front().procs_numbers.front()] = 0;
+                available_procs[active_tasks.front().procs_numbers.front()] = false;
                 active_tasks.front().procs_numbers.erase(active_tasks.front().procs_numbers.begin());
             }
-            // dodawanie do pliku gdy wychodzi
             active_tasks.erase(active_tasks.begin());
         }
 
         while (free_proc > 0 && flag) {
             flag = false;
 
-            // CHOSING THE BEST TASK TO ALLOCATE
+            // CHOOSING THE BEST TASK TO ALLOCATE
             while (( i < processes_list.size() ) && processes_list[i].r_j <= clock_tick ){
                 if ((task.p_j == 0 || processes_list[i].size_j > task.size_j) && processes_list[i].size_j <= free_proc) {
                     task = processes_list[i];
@@ -134,7 +134,7 @@ void File::parallelTask(vector<Process> processes_list) {
             // ALLOCATING THE TASK WHEN WE'VE GOT A CHOSEN ONE
             if (task.p_j != 0) {
                 task.f_t = clock_tick + task.p_j;
-                // asigning processors numbers to a current task
+                // assigning processors numbers to a current task
                 int procs_needed = task.size_j;
                 for ( int j = 0; j < maxProcs ; j++){
                     if(procs_needed != 0 && available_procs[j]==0) {
@@ -145,7 +145,7 @@ void File::parallelTask(vector<Process> processes_list) {
                 }
 
                 active_tasks.push_back(task);
-                // dodawanie do pliku  gdy wchodzi
+                // ADDING TO FILE
                 output << task.id << " " << task.f_t - task.p_j
                         << " " << task.f_t << " ";
                 for(int j : task.procs_numbers)
@@ -158,11 +158,9 @@ void File::parallelTask(vector<Process> processes_list) {
                 processes_list.erase(processes_list.begin()+proc_num);
 
                 free_proc -= task.size_j;
-                // delete task
                 i = 0;
                 task.p_j = 0;
             }
-            //cout << "Wychodzisz? Moje życie to żart" << endl;
         }
     clock_tick ++;
     }

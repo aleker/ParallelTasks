@@ -1,12 +1,18 @@
 #include <iostream>
+#include <chrono>
 #include "Process.h"
 #include "File.h"
 
 using namespace std;
+using namespace chrono;
+
 
 int main(int argc, char* argv[]) {
 
-    //clock_t beg_time = clock();
+    // TIME START
+    typedef high_resolution_clock Clock;
+    auto start = Clock::now();
+
     vector<Process> processes_list;
     File file;
 
@@ -34,14 +40,13 @@ int main(int argc, char* argv[]) {
     }
     cout << endl;
 
-
     file.parallelTask(processes_list);
 
-    // DISPLAY TIME
-    //sleep(10);
-    //clock_t end_time = clock();
-    //double duration = (end_time - beg_time )/(double) CLOCKS_PER_SEC;
-    //cout << duration << endl;
+    // TIME END
+    auto end = Clock::now();
+    auto duration = duration_cast<nanoseconds>(end - start);
+    cout << "Elapsed time: " << duration.count()/ 1000000000.0 << " seconds" << endl;
 
     return 0;
+
 }
