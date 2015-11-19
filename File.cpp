@@ -23,19 +23,34 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
         int flag = 0;
         string row;
         getline( file, row);
-        if (row.substr(0,11)=="; MaxJobs: ") {
-            helper=row.substr(11,10);
-            maxJobs = stoi(helper);
-            maxRecords = maxJobs;
-            cout << "maxJobs and maxRecords = " << maxJobs << endl;
-            if (tasks_amount == -1 || tasks_amount > maxJobs)
-                tasks_amount = maxJobs;
-        }
-        else if (row.substr(0,12)=="; MaxProcs: ") {
-            helper=row.substr(12,10);
-            maxProcs = stoi(helper);
-            maxNodes = maxProcs;
-            cout << "maxProcs and maxNodes = " << maxProcs << endl << endl;
+        if (row.substr(0,1) == ";" and row.length() > 10) {
+            const char* tab = row.c_str();
+            for (int i = 0; i < row.length() - 9; i++) {
+                if (row.substr(i, 8) == "MaxJobs:") {
+                    string number;
+                    for (int j = i + 9; j < row.length(); j++) {
+                        if (isdigit(tab[j]))
+                            number += tab[j];
+                    }
+                    maxJobs = stoi(number);
+                    maxRecords = maxJobs;
+                    cout << "maxJobs and maxRecords = " << maxJobs << endl;
+                    if (tasks_amount == -1 || tasks_amount > maxJobs)
+                        tasks_amount = maxJobs;
+                    break;
+                }
+                else if (row.substr(i, 9) == "MaxProcs:") {
+                    string number;
+                    for (int j = i + 10; j < row.length(); j++) {
+                        if (isdigit(tab[j]))
+                            number += tab[j];
+                    }
+                    maxNodes =stoi(number);
+                    maxProcs = maxNodes;
+                    cout << "maxProcs and maxNodes = " << maxProcs << endl << endl;
+                    break;
+                }
+            }
         }
         else if (row.substr(0,1) != ";"){
             tasks_amount --;
@@ -96,7 +111,7 @@ void File::parallelTask(vector<Process> processes_list) {
     int proc_num = i;
     bool flag;
     ofstream output;
-    output.open("output.txt");
+    output.open("outputDAS.swf");
     for(int j = 0 ; j < maxProcs ; j++)
         available_procs[j] = 0;
 
@@ -151,8 +166,8 @@ void File::parallelTask(vector<Process> processes_list) {
                 for(int j : task.procs_numbers)
                     output << j << " ";
                 output << endl;
-                task.display();
-                cout << "Clock " << clock_tick << endl;
+                //task.display();
+                //cout << "Clock " << clock_tick << endl;
 
                 sort(active_tasks.begin(), active_tasks.end(), myCmp2);
                 processes_list.erase(processes_list.begin()+proc_num);
@@ -162,7 +177,33 @@ void File::parallelTask(vector<Process> processes_list) {
                 task.p_j = 0;
             }
         }
-    clock_tick ++;
+        if (!active_tasks.empty()) {
+            if (active_tasks.front().f_t <= processes_list.front().r_j and clock_tick != active_tasks.front().f_t) {
+                clock_tick = (unsigned int)active_tasks.front().f_t;
+            }
+            else {
+                vector<Process>::iterator pointer;
+                pointer = processes_list.begin();
+                if (pointer->size_j <= free_proc) {
+                    clock_tick = (unsigned int) pointer->r_j;
+                }
+                else {
+                    do {
+                        pointer++;
+                        if (pointer->size_j <= free_proc) {
+                            clock_tick = (unsigned int) pointer->r_j;
+                            break;
+                        }
+                    } while (pointer->r_j < active_tasks.front().f_t and pointer != processes_list.end());
+                }
+                if (pointer->r_j >= active_tasks.front().f_t or pointer == processes_list.end()) {
+                    clock_tick = active_tasks.front().f_t;
+                }
+            }
+        }
+        else if (!processes_list.empty()) {
+            clock_tick = (unsigned int)processes_list.front().r_j;
+        }
     }
 output.close();
 }

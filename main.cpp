@@ -16,12 +16,14 @@ int main(int argc, char* argv[]) {
     vector<Process> processes_list;
     File file;
 
-    string file_name = "Files/test3.txt";
+    file.name = "Files/DAS2-fs0-2003-1.swf";
+    //file.name = "Files/NASA-iPSC-1993-2.1-cln.txt";
+    //string file_name = "Files/test3.txt";
     int tasks_amount = -1; //first n tasks
 
     // READING FILE NAME
     if (argc > 1) {
-        file_name = argv[1];
+        file.name = argv[1];
         cout << "argv[1]= " << argv[1] << endl;
         cout << "argc = " << argc << endl;
     }
@@ -32,13 +34,14 @@ int main(int argc, char* argv[]) {
         cout << "Tasks_amount = " << tasks_amount << endl;
     }
 
-    processes_list = file.reading(file_name, tasks_amount);
+    processes_list = file.reading(file.name, tasks_amount);
+
 
     // DISPLAY LIST OF PROCESSES
-    for (Process task: processes_list) {
-        task.display();
-    }
-    cout << endl;
+//    for (Process task: processes_list) {
+//        task.display();
+//    }
+//    cout << endl;
 
     file.parallelTask(processes_list);
 

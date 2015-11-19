@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <vector>
 #include <iomanip>
-#include <string.h>
+#include <string>
 #include <array>
 #include <iostream>
 #include <fstream>
@@ -19,16 +19,16 @@ using namespace std;
 class File {
 public:
     string helper;
+    string name;
     int maxJobs;
     int maxRecords;
     int maxProcs;
     int maxNodes;
 
-    vector<Process> reading(string name_of_file, int task_amount);
-
     File() { cout << "File created!" << endl; }
     ~File() { cout << "File destructed!" << endl;}
 
+    vector<Process> reading(string name_of_file, int task_amount);
     void parallelTask(vector<Process> processes_list);
 };
 
