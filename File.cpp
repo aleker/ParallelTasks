@@ -57,7 +57,7 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
             Process process;
             const char * tab = row.c_str();
             for(int i=0; i <= row.length(); i++){
-                if(isdigit(tab[i]) && flag<=6){
+                if((tab[i] == '-' or isdigit(tab[i])) and flag<=6){
                     flag++;
                     string number;
                     do{
