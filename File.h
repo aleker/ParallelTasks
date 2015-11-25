@@ -25,8 +25,8 @@ public:
     int maxProcs;
     int maxNodes;
 
-    File() { cout << "File created!" << endl; }
-    ~File() { cout << "File destructed!" << endl;}
+    File() { /* cout << "File created!" << endl; */ }
+    ~File() { /* cout << "File destructed!" << endl; */ }
 
     vector<Process> reading(string name_of_file, int task_amount);
     void parallelTask(vector<Process> processes_list);

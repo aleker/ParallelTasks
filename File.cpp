@@ -1,3 +1,4 @@
+#include <sstream>
 #include "File.h"
 
 
@@ -16,7 +17,7 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
     vector<Process> processes_list;
     file.open( name_of_file );
     if( !file.good() ) {
-        cout << "File not good enough, my soldier!" << endl;
+        cout << "File is not good enough, my soldier!" << endl;
         exit;
     }
     while ( !file.eof() && tasks_amount != 0) {
@@ -110,8 +111,14 @@ void File::parallelTask(vector<Process> processes_list) {
     int i = 0;
     int proc_num = i;
     bool flag;
+    stringstream output_name;
+    output_name << "OUT." << this->name;
     ofstream output;
-    output.open("outputDAS.swf");
+    output.open(output_name.str().c_str());
+    if( !output.good() ) {
+        cout << "Output file is not good enough, my soldier!" << endl;
+        return;
+    }
     for(int j = 0 ; j < maxProcs ; j++)
         available_procs[j] = 0;
 
