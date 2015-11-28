@@ -17,10 +17,10 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
     vector<Process> processes_list;
     file.open( name_of_file );
     if( !file.good() ) {
-        cout << "File is not good enough, my soldier!" << endl;
-        exit;
+        cout << "Input file is not good enough, my soldier!" << endl;
+        return processes_list;
     }
-    while ( !file.eof() && tasks_amount != 0) {
+    while ( !file.eof() and tasks_amount != 0) {
         int flag = 0;
         string row;
         getline( file, row);
@@ -36,7 +36,7 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
                     maxJobs = stoi(number);
                     maxRecords = maxJobs;
                     cout << "maxJobs and maxRecords = " << maxJobs << endl;
-                    if (tasks_amount == -1 || tasks_amount > maxJobs)
+                    if (tasks_amount == -1 or tasks_amount > maxJobs)
                         tasks_amount = maxJobs;
                     break;
                 }
@@ -92,7 +92,7 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
                         break;
                 }
             }
-            if (process.id >0 && process.r_j >= 0 &&  process.p_j > 0 && process.size_j > 0 ) {
+            if (process.id >0 and process.r_j >= 0 and  process.p_j > 0 and process.size_j > 0 ) {
                 //process.f_t = process.r_j + process.p_j;
                 processes_list.push_back(process);
             }
@@ -129,7 +129,7 @@ void File::parallelTask(vector<Process> processes_list) {
         task.p_j = 0;
 
         // FREEING THE PROCESSORS WHEN TASK'S FINISHED
-        while ( !active_tasks.empty() && active_tasks.front().f_t <= clock_tick){
+        while ( !active_tasks.empty() and active_tasks.front().f_t <= clock_tick){
             free_proc += active_tasks.front().size_j;
 
             // cleaning the bool array of procs numbers
@@ -140,12 +140,12 @@ void File::parallelTask(vector<Process> processes_list) {
             active_tasks.erase(active_tasks.begin());
         }
 
-        while (free_proc > 0 && flag) {
+        while (free_proc > 0 and flag) {
             flag = false;
 
             // CHOOSING THE BEST TASK TO ALLOCATE
-            while (( i < processes_list.size() ) && processes_list[i].r_j <= clock_tick ){
-                if ((task.p_j == 0 || processes_list[i].size_j > task.size_j) && processes_list[i].size_j <= free_proc) {
+            while (( i < processes_list.size() ) and processes_list[i].r_j <= clock_tick ){
+                if ((task.p_j == 0 or processes_list[i].size_j > task.size_j) and processes_list[i].size_j <= free_proc) {
                     task = processes_list[i];
                     proc_num = i;
                     flag = true;
@@ -159,7 +159,7 @@ void File::parallelTask(vector<Process> processes_list) {
                 // assigning processors numbers to a current task
                 int procs_needed = task.size_j;
                 for ( int j = 0; j < maxProcs ; j++){
-                    if(procs_needed != 0 && available_procs[j]==0) {
+                    if(procs_needed != 0 and available_procs[j]==0) {
                         available_procs[j] = 1;   //changing the status to "taken"
                         procs_needed--;
                         task.procs_numbers.push_back(j);
@@ -204,7 +204,7 @@ void File::parallelTask(vector<Process> processes_list) {
                     } while (pointer->r_j < active_tasks.front().f_t and pointer != processes_list.end());
                 }
                 if (pointer->r_j >= active_tasks.front().f_t or pointer == processes_list.end()) {
-                    clock_tick = active_tasks.front().f_t;
+                    clock_tick =(unsigned int) active_tasks.front().f_t;
                 }
             }
         }
@@ -212,5 +212,6 @@ void File::parallelTask(vector<Process> processes_list) {
             clock_tick = (unsigned int)processes_list.front().r_j;
         }
     }
-output.close();
+    cout << "Output file saved to " << output_name.str() << endl;
+    output.close();
 }

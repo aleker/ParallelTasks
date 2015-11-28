@@ -20,11 +20,11 @@ int main(int argc, char* argv[]) {
     // READING FILE NAME
     if (argc > 1) {
         file.name = argv[1];
-        cout << "argv[1]= " << argv[1] << endl;
-        cout << "argc = " << argc << endl;
+        //cout << "argv[1]= " << argv[1] << endl;
+        //cout << "argc = " << argc << endl;
     }
     else {
-        cout << "The file was not found. Please, enter the name (path) of the file.\n";
+        cout << "The file was not found. Please, enter the name of the file.\nThe file must be in the same directory as ParallelTasks.\n";
         return 0;
     }
 
@@ -35,6 +35,9 @@ int main(int argc, char* argv[]) {
     }
 
     processes_list = file.reading(file.name, tasks_amount);
+    if (processes_list.empty()) {
+        return 0;
+    }
     file.parallelTask(processes_list);
 
     // TIME END
