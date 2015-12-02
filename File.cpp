@@ -36,8 +36,10 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
                     maxJobs = stoi(number);
                     maxRecords = maxJobs;
                     cout << "maxJobs and maxRecords = " << maxJobs << endl;
-                    if (tasks_amount == -1 or tasks_amount > maxJobs)
+                    if (tasks_amount == -1 or tasks_amount > maxJobs) {
                         tasks_amount = maxJobs;
+                        cout << "Tasks_amount = maxJobs = " << tasks_amount << endl;
+                    }
                     break;
                 }
                 else if (row.substr(i, 9) == "MaxProcs:") {
@@ -64,7 +66,7 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
                     do{
                         number+=tab[i];
                         i++;
-                    }while(tab[i]!=' ');
+                    } while(isdigit(tab[i]));
 
                     switch(flag){
                         case 1:
