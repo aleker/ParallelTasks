@@ -56,7 +56,6 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
             }
         }
         else if (row.substr(0,1) != ";"){
-            tasks_amount --;
             Process process;
             const char * tab = row.c_str();
             for(int i=0; i <= row.length(); i++){
@@ -95,8 +94,8 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
                 }
             }
             if (process.id >0 and process.r_j >= 0 and  process.p_j > 0 and process.size_j > 0 ) {
-                //process.f_t = process.r_j + process.p_j;
                 processes_list.push_back(process);
+                tasks_amount --;
             }
         }
     }
@@ -105,6 +104,7 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
 }
 
 void File::parallelTask(vector<Process> processes_list) {
+    cout << "In parallelTask\n" << "processes_list.size = " << processes_list.size() << endl;
     unsigned int clock_tick = 0;
     int free_proc = maxProcs;
     Process task;
