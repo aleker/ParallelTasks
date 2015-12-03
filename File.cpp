@@ -35,10 +35,10 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
                     }
                     maxJobs = stoi(number);
                     maxRecords = maxJobs;
-                    cout << "maxJobs and maxRecords = " << maxJobs << endl;
+                    //cout << "maxJobs and maxRecords = " << maxJobs << endl;
                     if (tasks_amount == -1 or tasks_amount > maxJobs) {
                         tasks_amount = maxJobs;
-                        cout << "Tasks_amount = maxJobs = " << tasks_amount << endl;
+                        //cout << "Tasks_amount = maxJobs = " << tasks_amount << endl;
                     }
                     break;
                 }
@@ -50,7 +50,7 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
                     }
                     maxNodes =stoi(number);
                     maxProcs = maxNodes;
-                    cout << "maxProcs and maxNodes = " << maxProcs << endl << endl;
+                    //cout << "maxProcs and maxNodes = " << maxProcs << endl << endl;
                     break;
                 }
             }
@@ -214,6 +214,6 @@ void File::parallelTask(vector<Process> processes_list) {
             clock_tick = (unsigned int)processes_list.front().r_j;
         }
     }
-    cout << "Output file saved to " << output_name.str() << endl;
+    //cout << "Output file saved to " << output_name.str() << endl;
     output.close();
 }
