@@ -1,7 +1,10 @@
 #include <sstream>
 #include "File.h"
 
+// CONST VALUES
 #define COEFFICIENT_R_J     2;
+#define TEMPERATURE         1000;
+#define MIN_TEMPERATURE     50;
 
 vector<Process> tasks_order;
 
@@ -242,4 +245,13 @@ void File::findAlternativeSolution() throw(string) {
         }
     }
     else throw exception;
+}
+
+void File::simulatedAnnealing(vector<Process> processes_list) {
+    this->parallelTask(processes_list);
+    vector<Process> actual_solution = tasks_order;
+    int temperature = TEMPERATURE;
+    int min_temperature = MIN_TEMPERATURE;
+    unsigned int i = 0;
+    while ((temperature > MIN_TEMPERATURE) and )
 }
