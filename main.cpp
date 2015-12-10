@@ -45,6 +45,11 @@ int main(int argc, char* argv[]) {
     auto duration = duration_cast<nanoseconds>(end - start);
     cout << "Elapsed time: " << duration.count()/ 1000000000.0 << " seconds" << endl;
 
+//    for (int i = 0; i <= 10; i++) {
+//        int rand_procs_number = rand() % (30 - 3 - 0) + 0;
+//        cout << rand_procs_number << endl;
+//    }
+
     return 0;
 
 }

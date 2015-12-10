@@ -30,6 +30,8 @@ public:
 
     vector<Process> reading(string name_of_file, int task_amount);
     void parallelTask(vector<Process> processes_list);
+    void findAlternativeSolution() throw(string);
+
 };
 
 

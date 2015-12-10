@@ -1,6 +1,9 @@
 #include <sstream>
 #include "File.h"
 
+#define COEFFICIENT_R_J     2;
+
+vector<Process> tasks_order;
 
 bool myCmp(const Process& a, const Process& b)
 {
@@ -170,6 +173,7 @@ void File::parallelTask(vector<Process> processes_list) {
 
                 active_tasks.push_back(task);
                 // ADDING TO FILE
+                tasks_order.push_back(task);
                 output << task.id << " " << task.f_t - task.p_j
                         << " " << task.f_t << " ";
                 for(int j : task.procs_numbers)
@@ -216,4 +220,26 @@ void File::parallelTask(vector<Process> processes_list) {
     }
     cout << "Output file saved to " << output_name.str() << endl;
     output.close();
+}
+
+void File::findAlternativeSolution() throw(string) {
+    string exception = "The tasks_order is empty!\n";
+    unsigned long sizeOfCurrentOrder = tasks_order.size();
+    if (!tasks_order.empty()) {
+        // drawing task numbers
+        unsigned int task_number1;
+        unsigned int task_number2;
+        for (unsigned int i = 0; i <= (unsigned int) tasks_order.size() / 20; i++) {
+            do {
+                task_number1 =
+                        rand() % (((unsigned int) tasks_order.size() - (unsigned int) tasks_order.size() / 10) + 1) + 0;
+                task_number2 = rand() % ((task_number1 + (unsigned int) tasks_order.size() / 10 - task_number1) + 1) +
+                               task_number1;
+            } while ((tasks_order[task_number1].size_j < tasks_order[task_number2].size_j) and
+                    (tasks_order[task_number1].r_j > (tasks_order[task_number2].f_t - tasks_order[task_number2].p_j)));
+            tasks_order[task_number1].r_j = tasks_order[task_number2].r_j + COEFFICIENT_R_J;
+            this->parallelTask(tasks_order);
+        }
+    }
+    else throw exception;
 }
