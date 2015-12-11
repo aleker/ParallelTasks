@@ -10,6 +10,7 @@
 #include <array>
 #include <iostream>
 #include <fstream>
+#include <tgmath.h>
 #include "Process.h"
 
 
@@ -30,8 +31,9 @@ public:
 
     vector<Process> reading(string name_of_file, int task_amount);
     void parallelTask(vector<Process> processes_list);
-    void findAlternativeSolution() throw(string);
+    vector<Process> findAlternativeSolution(vector<Process> processes_list) throw(string);
     void simulatedAnnealing(vector<Process> processes_list);
+    void saveToFile(vector<Process> processes_vector, string type);
 
 };
 

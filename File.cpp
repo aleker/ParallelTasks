@@ -2,11 +2,15 @@
 #include "File.h"
 
 // CONST VALUES
-#define COEFFICIENT_R_J     2;
-#define TEMPERATURE         1000;
-#define MIN_TEMPERATURE     50;
+#define COEFFICIENT_R_J             2;
+#define TEMPERATURE                 1000;
+#define MIN_TEMPERATURE             50;
+#define ALFA                        8/10;
+#define MAX_COUNTER_BETTER_SOLUTION 20;
+#define MAX_COUNTER_WORSE_SOLUTION  20;
+#define MINUTES_AMOUNT              1;
 
-vector<Process> tasks_order;
+vector<Process> alternative_solution;
 
 bool myCmp(const Process& a, const Process& b)
 {
@@ -110,7 +114,11 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
 }
 
 void File::parallelTask(vector<Process> processes_list) {
-    cout << "In parallelTask\n" << "processes_list.size = " << processes_list.size() << endl;
+//    while (!alternative_solution.empty()) {
+//        delete alternative_solution.front();
+//    }
+    alternative_solution.clear();
+    //cout << "In parallelTask\n" << "processes_list.size = " << processes_list.size() << endl;
     unsigned int clock_tick = 0;
     int free_proc = maxProcs;
     Process task;
@@ -119,17 +127,6 @@ void File::parallelTask(vector<Process> processes_list) {
     int i = 0;
     int proc_num = i;
     bool flag;
-    stringstream output_name;
-    output_name << "OUT." << this->name;
-    ofstream output;
-    output.open(output_name.str().c_str());
-    if( !output.good() ) {
-        cout << "Output file is not good enough, my soldier!" << endl;
-        return;
-    }
-    for(int j = 0 ; j < maxProcs ; j++)
-        available_procs[j] = 0;
-
     while ( !processes_list.empty()) {
         i = 0;
         flag = true;       // to add more than one task in one clock_tick
@@ -173,18 +170,8 @@ void File::parallelTask(vector<Process> processes_list) {
                         task.procs_numbers.push_back(j);
                     }
                 }
-
                 active_tasks.push_back(task);
-                // ADDING TO FILE
-                tasks_order.push_back(task);
-                output << task.id << " " << task.f_t - task.p_j
-                        << " " << task.f_t << " ";
-                for(int j : task.procs_numbers)
-                    output << j << " ";
-                output << endl;
-                //task.display();
-                //cout << "Clock " << clock_tick << endl;
-
+                alternative_solution.push_back(task);
                 sort(active_tasks.begin(), active_tasks.end(), myCmp2);
                 processes_list.erase(processes_list.begin()+proc_num);
 
@@ -221,37 +208,124 @@ void File::parallelTask(vector<Process> processes_list) {
             clock_tick = (unsigned int)processes_list.front().r_j;
         }
     }
-    cout << "Output file saved to " << output_name.str() << endl;
-    output.close();
 }
 
-void File::findAlternativeSolution() throw(string) {
-    string exception = "The tasks_order is empty!\n";
-    unsigned long sizeOfCurrentOrder = tasks_order.size();
-    if (!tasks_order.empty()) {
+vector<Process> File::findAlternativeSolution(vector<Process> processes_list) throw(string) {
+    string exception = "The alternative_solution is empty!\n";
+    if (!processes_list.empty()) {
         // drawing task numbers
         unsigned int task_number1;
         unsigned int task_number2;
-        for (unsigned int i = 0; i <= (unsigned int) tasks_order.size() / 20; i++) {
+        for (unsigned int i = 0; i <= (unsigned int) processes_list.size() / 50; i++) {
             do {
                 task_number1 =
-                        rand() % (((unsigned int) tasks_order.size() - (unsigned int) tasks_order.size() / 10) + 1) + 0;
-                task_number2 = rand() % ((task_number1 + (unsigned int) tasks_order.size() / 10 - task_number1) + 1) +
+                        rand() % (((unsigned int) processes_list.size() - (unsigned int) processes_list.size() / 10) + 1) + 0;
+                task_number2 = rand() % ((task_number1 + (unsigned int) processes_list.size() / 10 - task_number1) + 1) +
                                task_number1;
-            } while ((tasks_order[task_number1].size_j < tasks_order[task_number2].size_j) and
-                    (tasks_order[task_number1].r_j > (tasks_order[task_number2].f_t - tasks_order[task_number2].p_j)));
-            tasks_order[task_number1].r_j = tasks_order[task_number2].r_j + COEFFICIENT_R_J;
-            this->parallelTask(tasks_order);
+            } while ((processes_list[task_number1].size_j < processes_list[task_number2].size_j) and
+                    (processes_list[task_number1].r_j > (processes_list[task_number2].f_t - processes_list[task_number2].p_j)));
+            processes_list[task_number1].r_j = processes_list[task_number2].r_j + COEFFICIENT_R_J;
+            sort(processes_list.begin(), processes_list.end(), myCmp);
+            this->parallelTask(alternative_solution);
         }
     }
     else throw exception;
+    return processes_list;
+}
+
+double probability(int actual_end_time, int actual_temperature) {
+    double parameter = -((alternative_solution.back().f_t - actual_end_time) / actual_temperature);
+    return exp(parameter);
+}
+
+int temperature_reducing(int actual_temperature) {
+    int alfa = ALFA;
+    return alfa * actual_temperature;
 }
 
 void File::simulatedAnnealing(vector<Process> processes_list) {
     this->parallelTask(processes_list);
-    vector<Process> actual_solution = tasks_order;
+    this->saveToFile(alternative_solution, "PRL");
+    vector<Process> actual_solution = alternative_solution;
+    vector<Process> old_good_solution = actual_solution;
     int temperature = TEMPERATURE;
     int min_temperature = MIN_TEMPERATURE;
-    unsigned int i = 0;
-    while ((temperature > MIN_TEMPERATURE) and )
+    unsigned int counter_worse_solution = 0;
+    unsigned int counter_better_solution = 0;
+    unsigned int max_counter_better_solution = MAX_COUNTER_BETTER_SOLUTION;
+    unsigned int max_counter_worse_solution = MAX_COUNTER_WORSE_SOLUTION;
+    clock_t start2 = clock();
+    int minutes_amount = MINUTES_AMOUNT;
+    int i = 0;
+    while (temperature > min_temperature) {
+        cout << temperature << endl;
+        if ((clock() - start2) / CLOCKS_PER_SEC > minutes_amount * 60) {
+            cout << "Time is over\n";
+            this->saveToFile(actual_solution,"SA");
+            return;
+        }
+        if (counter_worse_solution >= max_counter_worse_solution) {
+            cout << "Counter_worse_solution is max\n";
+            this->saveToFile(old_good_solution,"SA");
+            return;
+        }
+        // DELETING CONTENT OF TASKS_ORDER VECTOR
+//        while (!alternative_solution.empty()) {
+//            delete alternative_solution[0];
+//        }
+        // FIND ALTERNATIVE SOLUTION
+        alternative_solution = this->findAlternativeSolution(actual_solution);
+        this->saveToFile(alternative_solution, "ALTER");
+        if (alternative_solution.back().f_t <= actual_solution.back().f_t) {
+//            while (!actual_solution.empty()) {
+//                delete actual_solution[0];
+//            }
+            cout << "rewrite\n";
+            actual_solution.clear();
+            old_good_solution.clear();
+            actual_solution = alternative_solution;
+            old_good_solution = alternative_solution;
+            counter_better_solution++;
+            counter_worse_solution = 0;
+            if (counter_better_solution == max_counter_better_solution) {
+                temperature = temperature_reducing(temperature);
+            }
+        }
+        else if ((rand() % 100 + 0) < (probability(actual_solution.back().f_t, temperature))*100) {
+//            while (!actual_solution.empty()) {
+//                delete actual_solution[0];
+//            }
+            actual_solution.clear();
+            actual_solution = alternative_solution;
+            counter_worse_solution++;
+            counter_better_solution = 0;
+            temperature = temperature_reducing(temperature);
+            cout << "worse temperature\n";
+        }
+    }
+    cout << "Actual temperature is lower than boundary " << temperature << endl;
+    this->saveToFile(old_good_solution,"SA");
 }
+
+void File::saveToFile(vector<Process> processes_vector, string type) {
+    stringstream output_name;
+    output_name << type << "OUT." << this->name;
+    ofstream output;
+    output.open(output_name.str().c_str());
+    if( !output.good() ) {
+        cout << "Output file is not good enough, my soldier!" << endl;
+        return;
+    }
+    for (auto task: processes_vector) {
+        output << task.id << " " << task.f_t - task.p_j
+        << " " << task.f_t << " ";
+        for(int j : task.procs_numbers)
+            output << j << " ";
+        output << endl;
+    }
+
+    cout << "Output file saved to " << output_name.str() << endl;
+    output.close();
+}
+
+
