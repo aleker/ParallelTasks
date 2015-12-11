@@ -5,10 +5,10 @@
 #define COEFFICIENT_R_J             2;
 #define TEMPERATURE                 1000;
 #define MIN_TEMPERATURE             50;
-#define ALFA                        8/10;
+#define ALFA                        0.8;
 #define MAX_COUNTER_BETTER_SOLUTION 20;
 #define MAX_COUNTER_WORSE_SOLUTION  20;
-#define MINUTES_AMOUNT              1;
+#define MINUTES_AMOUNT              5;
 
 vector<Process> alternative_solution;
 
@@ -216,7 +216,7 @@ vector<Process> File::findAlternativeSolution(vector<Process> processes_list) th
         // drawing task numbers
         unsigned int task_number1;
         unsigned int task_number2;
-        for (unsigned int i = 0; i <= (unsigned int) processes_list.size() / 50; i++) {
+        for (unsigned int i = 0; i < 10/*(unsigned int) processes_list.size() / 50*/; i++) {
             do {
                 task_number1 =
                         rand() % (((unsigned int) processes_list.size() - (unsigned int) processes_list.size() / 10) + 1) + 0;
@@ -226,8 +226,8 @@ vector<Process> File::findAlternativeSolution(vector<Process> processes_list) th
                     (processes_list[task_number1].r_j > (processes_list[task_number2].f_t - processes_list[task_number2].p_j)));
             processes_list[task_number1].r_j = processes_list[task_number2].r_j + COEFFICIENT_R_J;
             sort(processes_list.begin(), processes_list.end(), myCmp);
-            this->parallelTask(alternative_solution);
         }
+        this->parallelTask(alternative_solution);
     }
     else throw exception;
     return processes_list;
@@ -238,12 +238,13 @@ double probability(int actual_end_time, int actual_temperature) {
     return exp(parameter);
 }
 
-int temperature_reducing(int actual_temperature) {
-    int alfa = ALFA;
+float temperature_reducing(int actual_temperature) {
+    float alfa = ALFA;
     return alfa * actual_temperature;
 }
 
 void File::simulatedAnnealing(vector<Process> processes_list) {
+    clock_t start2 = clock();
     this->parallelTask(processes_list);
     this->saveToFile(alternative_solution, "PRL");
     vector<Process> actual_solution = alternative_solution;
@@ -254,7 +255,6 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
     unsigned int counter_better_solution = 0;
     unsigned int max_counter_better_solution = MAX_COUNTER_BETTER_SOLUTION;
     unsigned int max_counter_worse_solution = MAX_COUNTER_WORSE_SOLUTION;
-    clock_t start2 = clock();
     int minutes_amount = MINUTES_AMOUNT;
     int i = 0;
     while (temperature > min_temperature) {
@@ -275,8 +275,8 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
 //        }
         // FIND ALTERNATIVE SOLUTION
         alternative_solution = this->findAlternativeSolution(actual_solution);
-        this->saveToFile(alternative_solution, "ALTER");
-        if (alternative_solution.back().f_t <= actual_solution.back().f_t) {
+        //this->saveToFile(alternative_solution, "ALTER");
+        if (alternative_solution.back().f_t < actual_solution.back().f_t) {
 //            while (!actual_solution.empty()) {
 //                delete actual_solution[0];
 //            }
@@ -288,7 +288,7 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
             counter_better_solution++;
             counter_worse_solution = 0;
             if (counter_better_solution == max_counter_better_solution) {
-                temperature = temperature_reducing(temperature);
+                temperature = (int)temperature_reducing(temperature);
             }
         }
         else if ((rand() % 100 + 0) < (probability(actual_solution.back().f_t, temperature))*100) {
@@ -299,8 +299,7 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
             actual_solution = alternative_solution;
             counter_worse_solution++;
             counter_better_solution = 0;
-            temperature = temperature_reducing(temperature);
-            cout << "worse temperature\n";
+            temperature = (int)temperature_reducing(temperature);
         }
     }
     cout << "Actual temperature is lower than boundary " << temperature << endl;
