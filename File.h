@@ -25,6 +25,7 @@ public:
     int maxRecords;
     int maxProcs;
     int maxNodes;
+    unsigned int average;
 
     File() { /* cout << "File created!" << endl; */ }
     ~File() { /* cout << "File destructed!" << endl; */ }
@@ -34,6 +35,7 @@ public:
     vector<Process> findAlternativeSolution(vector<Process> processes_list) throw(string);
     void simulatedAnnealing(vector<Process> processes_list);
     void saveToFile(vector<Process> processes_vector, string type);
+    void averageCalculating(vector<Process> processes_list);
 
 };
 
