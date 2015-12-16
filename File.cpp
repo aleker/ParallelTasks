@@ -299,7 +299,7 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
     unsigned int max_counter_worse_solution = MAX_COUNTER_WORSE_SOLUTION;
     int minutes_amount = MINUTES_AMOUNT;
     int i = 0;
-    while (temperature > min_temperature) {
+    while (1/*temperature > min_temperature*/) {
         //cout << "temperature " << temperature << endl;
         if ((clock() - start2) / CLOCKS_PER_SEC > minutes_amount * 60) {
             cout << "Time is over\n";
@@ -309,8 +309,8 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
         if (counter_worse_solution >= max_counter_worse_solution) {
             cout << "Counter_worse_solution is max\n";
             counter_worse_solution = 0;
-            actual_solution = old_good_solution;
-            lastTaskTime = old_last_task_time;
+//            actual_solution = old_good_solution;
+//            lastTaskTime = old_last_task_time;
         }
         // FIND ALTERNATIVE SOLUTION
         this->findAlternativeSolution(actual_solution);
@@ -335,9 +335,9 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
         else if ((rand() % 100 + 0) < (probability(actual_solution.back().f_t, temperature))*100) {
 
             cout << "get worse solution\n";
-            actual_solution.clear();
-            actual_solution = alternative_solution;
-            lastTaskTime = alternative_last_task_time;
+//            actual_solution.clear();
+//            actual_solution = alternative_solution;
+//            lastTaskTime = alternative_last_task_time;
             counter_worse_solution++;
             counter_better_solution = 0;
             temperature = (int)temperature_reducing(temperature);
