@@ -25,7 +25,8 @@ public:
     int maxRecords;
     int maxProcs;
     int maxNodes;
-    unsigned int average;
+    unsigned int averageReadyTime;
+    unsigned int averageProcsAmount;
     int lastTaskTime = 0;
     int old_last_task_time = 0;
 
