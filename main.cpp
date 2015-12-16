@@ -44,12 +44,16 @@ int main(int argc, char* argv[]) {
         cout << z << endl;
         for (int j = 1; j <= 10000; j *= 10) {
             for (int i = 0; i < 3; i++) {
+                cout << tab[i] * j << endl;
                 tasks_amount = tab[i] * j;
                 processes_list = file.reading(file.name, tasks_amount);
                 if (processes_list.empty()) {
                     return 0;
                 }
                 file.parallelTask(processes_list);
+//                if( tab[i] * j  > 2)
+                file.simulatedAnnealing(processes_list);
+//                else cout << "heh\n";
 
                 // TIME END
                 auto end = Clock::now();
