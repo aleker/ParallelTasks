@@ -26,6 +26,8 @@ public:
     int maxProcs;
     int maxNodes;
     unsigned int average;
+    int lastTaskTime = 0;
+    int old_last_task_time = 0;
 
     File() { /* cout << "File created!" << endl; */ }
     ~File() { /* cout << "File destructed!" << endl; */ }
