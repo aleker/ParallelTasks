@@ -10,6 +10,7 @@
 #include <array>
 #include <iostream>
 #include <fstream>
+#include <tgmath.h>
 #include "Process.h"
 
 
@@ -24,12 +25,21 @@ public:
     int maxRecords;
     int maxProcs;
     int maxNodes;
+    unsigned int averageReadyTime;
+    unsigned int averageProcsAmount;
+    int lastTaskTime = 0;
+    int old_last_task_time = 0;
 
     File() { /* cout << "File created!" << endl; */ }
     ~File() { /* cout << "File destructed!" << endl; */ }
 
     vector<Process> reading(string name_of_file, int task_amount);
     void parallelTask(vector<Process> processes_list);
+    vector<Process> findAlternativeSolution(vector<Process> processes_list) throw(string);
+    void simulatedAnnealing(vector<Process> processes_list);
+    void saveToFile(vector<Process> processes_vector, string type);
+    void averageCalculating(vector<Process> processes_list);
+
 };
 
 

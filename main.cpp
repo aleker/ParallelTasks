@@ -25,7 +25,8 @@ int main(int argc, char* argv[]) {
         //cout << "argc = " << argc << endl;
     }
     else {
-        cout << "The file was not found. Please, enter the name of the file.\nThe file must be in the same directory as ParallelTasks.\n";
+        cout << "The file was not found. Please, enter the name of the file.\n"
+                        "The file must be in the same directory as ParallelTasks.\n";
         return 0;
     }
 
