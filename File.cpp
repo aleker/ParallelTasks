@@ -25,6 +25,10 @@ bool myCmp2(const Process& a, const Process& b)
 {
     return a.f_t < b.f_t;  // smallest comes first
 }
+bool myCmp3(int a, int b)
+{
+    return a < b ;  // smallest comes first
+}
 
 vector<Process>  File::reading(string name_of_file, int tasks_amount) {
     fstream file;
@@ -262,21 +266,44 @@ float temperature_reducing(int actual_temperature) {
 }
 
 void File::averageCalculating(vector<Process> processes_list) {
-    unsigned long boundary;
-    unsigned long sum = 0, maxProcs = 0;
-    if (processes_list.size() > 100) boundary = processes_list.size();
-    else boundary = processes_list.size();
+    unsigned long sum = 0;
+    vector<int> vector_maxProces;
+    unsigned int boundary = (unsigned int)processes_list.size() / 3;
+    for (int i = 0; i < boundary; i++) {
+        vector_maxProces.push_back(processes_list[i].size_j);
+    }
+    sort(vector_maxProces.begin(), vector_maxProces.end(), myCmp3);
+    for (int i = boundary; i < processes_list.size(); i++) {
+        if (processes_list[i].size_j > vector_maxProces[0] ) {
+            vector_maxProces[0] = processes_list[i].size_j;
+            sort(vector_maxProces.begin(), vector_maxProces.end(), myCmp3);
+        }
+    }
+    unsigned long maxProces = 0;
+    unsigned int counter_maxProces = 0;
+    unsigned long average_procs_amount = 0;
 
     for (int i = 0; i < boundary -1 ; i++) {
         sum += processes_list[i+1].r_j - processes_list[i].r_j;
-        if(processes_list[i].size_j > maxProcs)
-            maxProcs = processes_list[i].size_j;
+        average_procs_amount += processes_list[i].size_j;
+        if(processes_list[i].size_j > maxProces) {
+            maxProces = processes_list[i].size_j;
+            counter_maxProces = 0;
+        }
+        if (processes_list[i].size_j == maxProces) {
+            counter_maxProces++;
+        }
     }
-    sum /= boundary;
-    maxProcs = (maxProcs + 1)/ 2;
+    average_procs_amount /= boundary;
+//    maxProces = (maxProces + 1) / 2;
+//    if (average_procs_amount < maxProces)
+//        this->averageProcsAmount = (unsigned int)average_procs_amount;
+//    else
+//        this->averageProcsAmount = (unsigned int)maxProces;
+    this->averageProcsAmount = (unsigned int)vector_maxProces[0];
+    cout << "vector_maxProces[0] = " << vector_maxProces[0] << endl;
+    sum /= processes_list.size();
     this->averageReadyTime = (unsigned int)sum;
-    this->averageProcsAmount = (unsigned int)maxProcs;
-
 }
 
 void File::simulatedAnnealing(vector<Process> processes_list) {
@@ -284,6 +311,7 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
     srand(time(NULL));
     parallelTask(processes_list);
     averageCalculating(processes_list);
+    this->saveToFile(alternative_solution, "PRL");
     cout << "this->averageReadyTime = " << this->averageReadyTime << endl;
     cout << "this->averageProcsAmount = " << this->averageProcsAmount << endl;
     //this->saveToFile(alternative_solution, "PRL");
@@ -321,10 +349,10 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
         }
         //this->saveToFile(alternative_solution, "ALTER");
         if (alternative_last_task_time < lastTaskTime) {
-            cout << "rewrite\n";
+            cout << "Processing better scheduling\n";
             actual_solution.clear();
             if (old_last_task_time > alternative_last_task_time) {
-                cout << "rewrite old - hell yeah, i've found better!!!!!!!!!!!!!!!!!\n";
+                cout << "Found new better scheduling \n";
                 old_good_solution.clear();
                 old_good_solution = alternative_solution;
                 old_last_task_time = alternative_last_task_time;
@@ -372,3 +400,5 @@ void File::saveToFile(vector<Process> processes_vector, string type) {
     //cout << "Output file saved to " << output_name.str() << endl;
     output.close();
 }
+
+
