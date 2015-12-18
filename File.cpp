@@ -181,9 +181,9 @@ void File::parallelTask(vector<Process> processes_list) {
                 active_tasks.push_back(task);
                 alternative_solution.push_back(task);
                 // testing parallel:
-                if (task.f_t > lastTaskTime) {
-                    lastTaskTime = task.f_t;
-                }
+//                if (task.f_t > lastTaskTime) {
+//                    lastTaskTime = task.f_t;
+//                }
                 if (alternative_last_task_time < task.f_t)
                     alternative_last_task_time = task.f_t;
                 sort(active_tasks.begin(), active_tasks.end(), myCmp2);
@@ -303,7 +303,7 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
     this->saveToFile(alternative_solution, "PRL");
     cout << "this->averageReadyTime = " << this->averageReadyTime << endl;
     cout << "this->averageProcsAmount = " << this->averageProcsAmount << endl;
-    //this->saveToFile(alternative_solution, "PRL");
+    this->saveToFile(alternative_solution, "PRL");
     vector<Process> actual_solution = alternative_solution;
     lastTaskTime = alternative_last_task_time;
     vector<Process> old_good_solution = actual_solution;
@@ -320,7 +320,7 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
         //cout << "temperature " << temperature << endl;
         if ((clock() - start2) / CLOCKS_PER_SEC > minutes_amount * 60) {
             cout << "Time is over\n";
-            //this->saveToFile(actual_solution,"SA");
+            this->saveToFile(actual_solution,"SA");
             return;
         }
         if (counter_worse_solution >= max_counter_worse_solution) {
@@ -370,7 +370,7 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
         }
     }
     cout << "Actual temperature is lower than boundary " << temperature << endl;
-    //this->saveToFile(old_good_solution,"SA");
+    this->saveToFile(old_good_solution,"SA");
 }
 
 void File::saveToFile(vector<Process> processes_vector, string type) {

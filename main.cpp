@@ -26,45 +26,33 @@ int main(int argc, char* argv[]) {
     }
     else {
         cout << "The file was not found. Please, enter the name of the file.\n"
-                        "The file must be in the same directory as ParallelTasks.\n";
+                "The file must be in the same directory as ParallelTasks.\n";
         return 0;
     }
 
-    // FOR TESTING
-    ofstream output;
-    stringstream output_name;
-    output_name << "TEST." << file.name;
-    output.open(output_name.str().c_str());
-    if( !output.good() ) {
-        cout << "Output file is not good enough, my soldier!" << endl;
+    // READING TASKS_AMOUNT
+    if (argc > 2) {
+        tasks_amount = stoi(argv[2]);
+        cout << "Tasks_amount = " << tasks_amount << endl;
+    }
+
+    processes_list = file.reading(file.name, tasks_amount);
+    if (processes_list.empty()) {
         return 0;
     }
-    int tab[3] = {1,2,5};
-    for (int z = 1; z < 2; z++) {
-        //cout << z << endl;
-        for (int j = 1; j <= 10000; j *= 10) {
-            for (int i = 0; i < 3; i++) {
-                if (tab[i] * j <= 10000) {
-                    cout << tab[i] * j << endl;
-                    tasks_amount = tab[i] * j;
-                    processes_list = file.reading(file.name, tasks_amount);
-                    if (processes_list.empty()) {
-                        return 0;
-                    }
-                    //file.parallelTask(processes_list);
-                    file.simulatedAnnealing(processes_list);
+    //file.parallelTask(processes_list);
+    file.simulatedAnnealing(processes_list);
 
-                    // TIME END
-                    auto end = Clock::now();
-                    auto duration = duration_cast<nanoseconds>(end - start);
-                    output << tasks_amount << ";" << duration.count() / 1000000000.0 << ";" << file.lastTaskTime <<
-                    endl;
-                    start = Clock::now();
-                }
-            }
-        }
-    }
-    output.close();
+    // TIME END
+    auto end = Clock::now();
+    auto duration = duration_cast<nanoseconds>(end - start);
+    cout << "Elapsed time: " << duration.count()/ 1000000000.0 << " seconds" << endl;
+
+//    for (int i = 0; i <= 10; i++) {
+//        int rand_procs_number = rand() % (30 - 3 - 0) + 0;
+//        cout << rand_procs_number << endl;
+//    }
+
     return 0;
 
 }
