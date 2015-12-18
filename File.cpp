@@ -180,6 +180,10 @@ void File::parallelTask(vector<Process> processes_list) {
                 }
                 active_tasks.push_back(task);
                 alternative_solution.push_back(task);
+                // testing parallel:
+                if (task.f_t > lastTaskTime) {
+                    lastTaskTime = task.f_t;
+                }
                 if (alternative_last_task_time < task.f_t)
                     alternative_last_task_time = task.f_t;
                 sort(active_tasks.begin(), active_tasks.end(), myCmp2);
@@ -268,40 +272,22 @@ float temperature_reducing(int actual_temperature) {
 void File::averageCalculating(vector<Process> processes_list) {
     unsigned long sum = 0;
     vector<int> vector_maxProces;
-    unsigned int boundary = (unsigned int)processes_list.size() / 3;
+    unsigned int boundary = (unsigned int)(processes_list.size() * 0.1);
+    if(boundary == 0 ) boundary = 1;
     for (int i = 0; i < boundary; i++) {
         vector_maxProces.push_back(processes_list[i].size_j);
+        sum += processes_list[i+1].r_j - processes_list[i].r_j;
     }
     sort(vector_maxProces.begin(), vector_maxProces.end(), myCmp3);
-    for (int i = boundary; i < processes_list.size(); i++) {
+    for (int i = boundary; i < processes_list.size() - 1; i++) {
         if (processes_list[i].size_j > vector_maxProces[0] ) {
             vector_maxProces[0] = processes_list[i].size_j;
             sort(vector_maxProces.begin(), vector_maxProces.end(), myCmp3);
         }
-    }
-    unsigned long maxProces = 0;
-    unsigned int counter_maxProces = 0;
-    unsigned long average_procs_amount = 0;
-
-    for (int i = 0; i < boundary -1 ; i++) {
         sum += processes_list[i+1].r_j - processes_list[i].r_j;
-        average_procs_amount += processes_list[i].size_j;
-        if(processes_list[i].size_j > maxProces) {
-            maxProces = processes_list[i].size_j;
-            counter_maxProces = 0;
-        }
-        if (processes_list[i].size_j == maxProces) {
-            counter_maxProces++;
-        }
     }
-    average_procs_amount /= boundary;
-//    maxProces = (maxProces + 1) / 2;
-//    if (average_procs_amount < maxProces)
-//        this->averageProcsAmount = (unsigned int)average_procs_amount;
-//    else
-//        this->averageProcsAmount = (unsigned int)maxProces;
     this->averageProcsAmount = (unsigned int)vector_maxProces[0];
-    cout << "vector_maxProces[0] = " << vector_maxProces[0] << endl;
+    //cout << "vector_maxProces[0] = " << vector_maxProces[0] << endl;
     sum /= processes_list.size();
     this->averageReadyTime = (unsigned int)sum;
 }
@@ -310,6 +296,9 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
     clock_t start2 = clock();
     srand(time(NULL));
     parallelTask(processes_list);
+    if (processes_list.size() <= 2) {
+        return;
+    }
     averageCalculating(processes_list);
     this->saveToFile(alternative_solution, "PRL");
     cout << "this->averageReadyTime = " << this->averageReadyTime << endl;
@@ -335,24 +324,24 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
             return;
         }
         if (counter_worse_solution >= max_counter_worse_solution) {
-          //  cout << "Counter_worse_solution is max\n";
+           // cout << "Counter_worse_solution is max\n";
             counter_worse_solution = 0;
             actual_solution = old_good_solution;
             lastTaskTime = old_last_task_time;
         }
         // FIND ALTERNATIVE SOLUTION
-        if (actual_solution.size() > 2)
+        //if (actual_solution.size() > 2)
             this->findAlternativeSolution(actual_solution);
-        else {
+        //else {
             //this->saveToFile(actual_solution, "SA");
-            return;
-        }
+        //    return;
+        //}
         //this->saveToFile(alternative_solution, "ALTER");
         if (alternative_last_task_time < lastTaskTime) {
-            cout << "Processing better scheduling\n";
+            //cout << "Processing better scheduling\n";
             actual_solution.clear();
             if (old_last_task_time > alternative_last_task_time) {
-                cout << "Found new better scheduling \n";
+                cout << "*********************Found new better scheduling************************** \n";
                 old_good_solution.clear();
                 old_good_solution = alternative_solution;
                 old_last_task_time = alternative_last_task_time;
@@ -367,12 +356,16 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
         }
         else if ((rand() % 100 + 0) < (probability(actual_solution.back().f_t, temperature))*100) {
 
-    //        cout << "get worse solution\n";
+           //cout << "get worse solution\n";
             actual_solution.clear();
             actual_solution = alternative_solution;
             lastTaskTime = alternative_last_task_time;
             counter_worse_solution++;
             counter_better_solution = 0;
+            temperature = (int)temperature_reducing(temperature);
+        }
+        else {
+            //cout <<"so miserable, i've done nothing\n";
             temperature = (int)temperature_reducing(temperature);
         }
     }

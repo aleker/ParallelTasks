@@ -40,26 +40,27 @@ int main(int argc, char* argv[]) {
         return 0;
     }
     int tab[3] = {1,2,5};
-    for (int z = 1; z < 16; z++) {
-        cout << z << endl;
+    for (int z = 1; z < 2; z++) {
+        //cout << z << endl;
         for (int j = 1; j <= 10000; j *= 10) {
             for (int i = 0; i < 3; i++) {
-                cout << tab[i] * j << endl;
-                tasks_amount = tab[i] * j;
-                processes_list = file.reading(file.name, tasks_amount);
-                if (processes_list.empty()) {
-                    return 0;
-                }
-                file.parallelTask(processes_list);
-//                if( tab[i] * j  > 2)
-                file.simulatedAnnealing(processes_list);
-//                else cout << "heh\n";
+                if (tab[i] * j <= 10000) {
+                    cout << tab[i] * j << endl;
+                    tasks_amount = tab[i] * j;
+                    processes_list = file.reading(file.name, tasks_amount);
+                    if (processes_list.empty()) {
+                        return 0;
+                    }
+                    //file.parallelTask(processes_list);
+                    file.simulatedAnnealing(processes_list);
 
-                // TIME END
-                auto end = Clock::now();
-                auto duration = duration_cast<nanoseconds>(end - start);
-                output << tasks_amount << ";" << duration.count() / 1000000000.0 << endl;
-                start = Clock::now();
+                    // TIME END
+                    auto end = Clock::now();
+                    auto duration = duration_cast<nanoseconds>(end - start);
+                    output << tasks_amount << ";" << duration.count() / 1000000000.0 << ";" << file.lastTaskTime <<
+                    endl;
+                    start = Clock::now();
+                }
             }
         }
     }
