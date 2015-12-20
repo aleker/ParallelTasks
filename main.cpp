@@ -21,8 +21,6 @@ int main(int argc, char* argv[]) {
     // READING FILE NAME
     if (argc > 1) {
         file.name = argv[1];
-        //cout << "argv[1]= " << argv[1] << endl;
-        //cout << "argc = " << argc << endl;
     }
     else {
         cout << "The file was not found. Please, enter the name of the file.\n"
@@ -39,18 +37,12 @@ int main(int argc, char* argv[]) {
     if (processes_list.empty()) {
         return 0;
     }
-    //file.parallelTask(processes_list);
     file.simulatedAnnealing(processes_list);
 
     // TIME END
     auto end = Clock::now();
     auto duration = duration_cast<nanoseconds>(end - start);
     cout << "Elapsed time: " << duration.count()/ 1000000000.0 << " seconds" << endl;
-
-//    for (int i = 0; i <= 10; i++) {
-//        int rand_procs_number = rand() % (30 - 3 - 0) + 0;
-//        cout << rand_procs_number << endl;
-//    }
 
     return 0;
 
