@@ -35,7 +35,6 @@ int main(int argc, char* argv[]) {
         tasks_amount = stoi(argv[2]);
         cout << "Tasks_amount = " << tasks_amount << endl;
     }
-
     processes_list = file.reading(file.name, tasks_amount);
     if (processes_list.empty()) {
         return 0;

@@ -56,7 +56,7 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
                     //cout << "maxJobs and maxRecords = " << maxJobs << endl;
                     if (tasks_amount == -1 or tasks_amount > maxJobs) {
                         tasks_amount = maxJobs;
-                        //cout << "Tasks_amount = maxJobs = " << tasks_amount << endl;
+                        cout << "Tasks_amount = maxJobs = " << tasks_amount << endl;
                     }
                     break;
                 }
@@ -118,6 +118,7 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
         }
     }
     sort(processes_list.begin(), processes_list.end(), myCmp);
+    saveToFile(processes_list,"STARTOWY");
     return processes_list;
 }
 
@@ -301,6 +302,7 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
     }
     averageCalculating(processes_list);
     this->saveToFile(alternative_solution, "PRL");
+
     cout << "this->averageReadyTime = " << this->averageReadyTime << endl;
     cout << "this->averageProcsAmount = " << this->averageProcsAmount << endl;
     this->saveToFile(alternative_solution, "PRL");
@@ -332,12 +334,7 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
             lastTaskTime = old_last_task_time;
         }
         // FIND ALTERNATIVE SOLUTION
-        //if (actual_solution.size() > 2)
-            this->findAlternativeSolution(actual_solution);
-        //else {
-            //this->saveToFile(actual_solution, "SA");
-        //    return;
-        //}
+        this->findAlternativeSolution(actual_solution);
         //this->saveToFile(alternative_solution, "ALTER");
         if (alternative_last_task_time < lastTaskTime) {
             //cout << "Processing better scheduling\n";
@@ -374,7 +371,7 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
     cout << "Actual temperature is lower than boundary " << temperature << endl;
     actual_solution = old_good_solution;
     lastTaskTime = old_last_task_time;
-    this->saveToFile(old_good_solution,"SA");
+    this->saveToFile(actual_solution,"SA");
 }
 
 void File::saveToFile(vector<Process> processes_vector, string type) {
