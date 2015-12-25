@@ -136,7 +136,13 @@ void File::parallelTask(vector<Process> processes_list) {
     int i = 0;
     int proc_num = i;
     bool flag;
+    int minutes_amount = MINUTES_AMOUNT;
     while ( !processes_list.empty()) {
+        if ((clock() - start2) / CLOCKS_PER_SEC > minutes_amount * 60) {
+            cout << "Time is over in ParallelTask\n";
+            time_is_over = true;
+            return;
+        }
         i = 0;
         flag = true;       // to add more than one task in one clock_tick
         //delete task;
@@ -271,6 +277,7 @@ float temperature_reducing(int actual_temperature) {
 }
 
 void File::averageCalculating(vector<Process> processes_list) {
+    cout <<"Average Calculation";
     unsigned long sum = 0;
     vector<int> vector_maxProces;
     unsigned int boundary = (unsigned int)(processes_list.size() * 0.1);
@@ -294,9 +301,13 @@ void File::averageCalculating(vector<Process> processes_list) {
 }
 
 void File::simulatedAnnealing(vector<Process> processes_list) {
-    clock_t start2 = clock();
     srand(time(NULL));
     parallelTask(processes_list);
+    if (time_is_over == true) {
+        cout << "Time is over before first Parallel Task ordering\n";
+        cout << "No file saved\n";
+        return;
+    }
     if (processes_list.size() <= 2) {
         return;
     }
@@ -328,16 +339,23 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
             return;
         }
         if (counter_worse_solution >= max_counter_worse_solution) {
-           // cout << "Counter_worse_solution is max\n";
+            cout << "Counter_worse_solution is max\n";
             counter_worse_solution = 0;
             actual_solution = old_good_solution;
             lastTaskTime = old_last_task_time;
         }
         // FIND ALTERNATIVE SOLUTION
         this->findAlternativeSolution(actual_solution);
+        if (time_is_over == true) {
+            cout << "Time is over\n";
+            actual_solution = old_good_solution;
+            lastTaskTime = old_last_task_time;
+            this->saveToFile(actual_solution,"SA");
+            return;
+        }
         //this->saveToFile(alternative_solution, "ALTER");
         if (alternative_last_task_time < lastTaskTime) {
-            //cout << "Processing better scheduling\n";
+            cout << "Processing better scheduling\n";
             actual_solution.clear();
             if (old_last_task_time > alternative_last_task_time) {
                 cout << "*********************Found new better scheduling************************** \n";
@@ -364,7 +382,7 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
             temperature = (int)temperature_reducing(temperature);
         }
         else {
-            //cout <<"so miserable, i've done nothing\n";
+            cout <<"so miserable, i've done nothing\n";
             temperature = (int)temperature_reducing(temperature);
         }
     }

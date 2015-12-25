@@ -39,6 +39,7 @@ int main(int argc, char* argv[]) {
     if (processes_list.empty()) {
         return 0;
     }
+    file.start2 = clock();
     //file.parallelTask(processes_list);
     file.simulatedAnnealing(processes_list);
 
