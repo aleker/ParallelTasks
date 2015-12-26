@@ -118,12 +118,14 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
         }
     }
     sort(processes_list.begin(), processes_list.end(), myCmp);
+    saveToFile(processes_list,"STARTOWY");
     return processes_list;
 }
 
 void File::parallelTask(vector<Process> processes_list) {
     alternative_solution.clear();
     alternative_last_task_time = 0;
+    //cout << "In parallelTask\n" << "processes_list.size = " << processes_list.size() << endl;
     unsigned int clock_tick = 0;
     int free_proc = maxProcs;
     Process task;
@@ -134,9 +136,16 @@ void File::parallelTask(vector<Process> processes_list) {
     int i = 0;
     int proc_num = i;
     bool flag;
+    int minutes_amount = MINUTES_AMOUNT;
     while ( !processes_list.empty()) {
+        if ((clock() - start2) / CLOCKS_PER_SEC > minutes_amount * 60) {
+            cout << "Time is over in ParallelTask\n";
+            time_is_over = true;
+            return;
+        }
         i = 0;
         flag = true;       // to add more than one task in one clock_tick
+        //delete task;
         task.p_j = 0;
 
         // FREEING THE PROCESSORS WHEN TASK'S FINISHED
@@ -178,6 +187,10 @@ void File::parallelTask(vector<Process> processes_list) {
                 }
                 active_tasks.push_back(task);
                 alternative_solution.push_back(task);
+                // testing parallel:
+//                if (task.f_t > lastTaskTime) {
+//                    lastTaskTime = task.f_t;
+//                }
                 if (alternative_last_task_time < task.f_t)
                     alternative_last_task_time = task.f_t;
                 sort(active_tasks.begin(), active_tasks.end(), myCmp2);
@@ -226,17 +239,21 @@ vector<Process> File::findAlternativeSolution(vector<Process> processes_list) th
         unsigned int task_number2;
         unsigned int amount = AMOUNT_OF_SWAPS;
         unsigned int coefficient = this->averageReadyTime * COEFFICIENT_R_J;
+        //srand(time(NULL));
         for (unsigned int i = 0; i < amount; i++) {
+            // TODO what about / 10
             do {
                 do {
                     task_number1 =
                             rand() % (((unsigned int) processes_list.size() - (unsigned int) processes_list.size() / 10) + 1) + 0;
                 } while (processes_list[task_number1].size_j < averageProcsAmount);
+                //task_number2 = rand() % ((task_number1 + (unsigned int) processes_list.size() / 10 - task_number1) + 1) + task_number1;
                 task_number2 = rand() % (((unsigned int)processes_list.size()) - task_number1) + task_number1;
             } while ((processes_list[task_number1].size_j < processes_list[task_number2].size_j) and
                     (processes_list[task_number1].r_j > (processes_list[task_number2].f_t - processes_list[task_number2].p_j)));
             processes_list[task_number1].r_j = processes_list[task_number2].r_j + coefficient;
 
+            //cout << " " << processes_list[task_number1].id << "," << processes_list[task_number2].id << " ";
             sort(processes_list.begin(), processes_list.end(), myCmp);
         }
         for (int i = 0; i < processes_list.size(); i++) {
@@ -260,6 +277,7 @@ float temperature_reducing(int actual_temperature) {
 }
 
 void File::averageCalculating(vector<Process> processes_list) {
+    cout <<"Average Calculation";
     unsigned long sum = 0;
     vector<int> vector_maxProces;
     unsigned int boundary = (unsigned int)(processes_list.size() * 0.1);
@@ -277,21 +295,28 @@ void File::averageCalculating(vector<Process> processes_list) {
         sum += processes_list[i+1].r_j - processes_list[i].r_j;
     }
     this->averageProcsAmount = (unsigned int)vector_maxProces[0];
+    //cout << "vector_maxProces[0] = " << vector_maxProces[0] << endl;
     sum /= processes_list.size();
     this->averageReadyTime = (unsigned int)sum;
 }
 
 void File::simulatedAnnealing(vector<Process> processes_list) {
-    clock_t start2 = clock();
     srand(time(NULL));
     parallelTask(processes_list);
+    if (time_is_over == true) {
+        cout << "Time is over before first Parallel Task ordering\n";
+        cout << "No file saved\n";
+        return;
+    }
     if (processes_list.size() <= 2) {
         return;
     }
     averageCalculating(processes_list);
+    this->saveToFile(alternative_solution, "PRL");
+
     cout << "this->averageReadyTime = " << this->averageReadyTime << endl;
     cout << "this->averageProcsAmount = " << this->averageProcsAmount << endl;
-//    this->saveToFile(alternative_solution, "PRL");
+    this->saveToFile(alternative_solution, "PRL");
     vector<Process> actual_solution = alternative_solution;
     lastTaskTime = alternative_last_task_time;
     vector<Process> old_good_solution = actual_solution;
@@ -314,15 +339,23 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
             return;
         }
         if (counter_worse_solution >= max_counter_worse_solution) {
-           // cout << "Counter_worse_solution is max\n";
+            cout << "Counter_worse_solution is max\n";
             counter_worse_solution = 0;
             actual_solution = old_good_solution;
             lastTaskTime = old_last_task_time;
         }
         // FIND ALTERNATIVE SOLUTION
         this->findAlternativeSolution(actual_solution);
+        if (time_is_over == true) {
+            cout << "Time is over\n";
+            actual_solution = old_good_solution;
+            lastTaskTime = old_last_task_time;
+            this->saveToFile(actual_solution,"SA");
+            return;
+        }
+        //this->saveToFile(alternative_solution, "ALTER");
         if (alternative_last_task_time < lastTaskTime) {
-            //cout << "Processing better scheduling\n";
+            cout << "Processing better scheduling\n";
             actual_solution.clear();
             if (old_last_task_time > alternative_last_task_time) {
                 cout << "*********************Found new better scheduling************************** \n";
@@ -339,6 +372,8 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
             }
         }
         else if ((rand() % 100 + 0) < (probability(actual_solution.back().f_t, temperature))*100) {
+
+           //cout << "get worse solution\n";
             actual_solution.clear();
             actual_solution = alternative_solution;
             lastTaskTime = alternative_last_task_time;
@@ -347,6 +382,7 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
             temperature = (int)temperature_reducing(temperature);
         }
         else {
+            cout <<"so miserable, i've done nothing\n";
             temperature = (int)temperature_reducing(temperature);
         }
     }
@@ -362,7 +398,7 @@ void File::saveToFile(vector<Process> processes_vector, string type) {
     ofstream output;
     output.open(output_name.str().c_str());
     if( !output.good() ) {
-        cout << "Output file is not good enough!" << endl;
+        cout << "Output file is not good enough, my soldier!" << endl;
         return;
     }
     for (auto task: processes_vector) {
@@ -372,7 +408,8 @@ void File::saveToFile(vector<Process> processes_vector, string type) {
             output << j << " ";
         output << endl;
     }
-    cout << "Output file saved to " << output_name.str() << endl;
+
+    //cout << "Output file saved to " << output_name.str() << endl;
     output.close();
 }
 

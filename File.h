@@ -29,6 +29,8 @@ public:
     unsigned int averageProcsAmount;
     int lastTaskTime = 0;
     int old_last_task_time = 0;
+    clock_t start2;
+    bool time_is_over = false;
 
     File() { /* cout << "File created!" << endl; */ }
     ~File() { /* cout << "File destructed!" << endl; */ }
