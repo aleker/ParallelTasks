@@ -11,8 +11,6 @@
 #define MINUTES_AMOUNT              5;
 #define AMOUNT_OF_SWAPS             10;      //10;
 
-// TODO set amount_of_swaps & MAX_COUNTER_WORSE_SOLUTION & alfa
-
 vector<Process> alternative_solution;
 int alternative_last_task_time = 0;
 
@@ -35,7 +33,7 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
     vector<Process> processes_list;
     file.open( name_of_file );
     if( !file.good() ) {
-        cout << "Input file is not good enough, my soldier!" << endl;
+        cout << "Input file is not good enough!" << endl;
         return processes_list;
     }
     while ( !file.eof() and tasks_amount != 0) {
@@ -118,7 +116,6 @@ vector<Process>  File::reading(string name_of_file, int tasks_amount) {
         }
     }
     sort(processes_list.begin(), processes_list.end(), myCmp);
-    saveToFile(processes_list,"STARTOWY");
     return processes_list;
 }
 
@@ -277,7 +274,7 @@ float temperature_reducing(int actual_temperature) {
 }
 
 void File::averageCalculating(vector<Process> processes_list) {
-    cout <<"Average Calculation";
+    //cout <<"Average Calculation";
     unsigned long sum = 0;
     vector<int> vector_maxProces;
     unsigned int boundary = (unsigned int)(processes_list.size() * 0.1);
@@ -312,11 +309,10 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
         return;
     }
     averageCalculating(processes_list);
-    this->saveToFile(alternative_solution, "PRL");
+    //this->saveToFile(alternative_solution, "PRL");
 
     cout << "this->averageReadyTime = " << this->averageReadyTime << endl;
     cout << "this->averageProcsAmount = " << this->averageProcsAmount << endl;
-    this->saveToFile(alternative_solution, "PRL");
     vector<Process> actual_solution = alternative_solution;
     lastTaskTime = alternative_last_task_time;
     vector<Process> old_good_solution = actual_solution;
@@ -346,7 +342,7 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
         }
         // FIND ALTERNATIVE SOLUTION
         this->findAlternativeSolution(actual_solution);
-        if (time_is_over == true) {
+        if (time_is_over) {
             cout << "Time is over\n";
             actual_solution = old_good_solution;
             lastTaskTime = old_last_task_time;
@@ -355,7 +351,7 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
         }
         //this->saveToFile(alternative_solution, "ALTER");
         if (alternative_last_task_time < lastTaskTime) {
-            cout << "Processing better scheduling\n";
+            //cout << "Processing better scheduling\n";
             actual_solution.clear();
             if (old_last_task_time > alternative_last_task_time) {
                 cout << "*********************Found new better scheduling************************** \n";
@@ -382,11 +378,11 @@ void File::simulatedAnnealing(vector<Process> processes_list) {
             temperature = (int)temperature_reducing(temperature);
         }
         else {
-            cout <<"so miserable, i've done nothing\n";
+            //cout <<"I've done nothing\n";
             temperature = (int)temperature_reducing(temperature);
         }
     }
-    cout << "Actual temperature is lower than boundary " << temperature << endl;
+    cout << "Actual temperature is lower than boundary\n" << temperature << endl;
     actual_solution = old_good_solution;
     lastTaskTime = old_last_task_time;
     this->saveToFile(actual_solution,"SA");
@@ -398,7 +394,7 @@ void File::saveToFile(vector<Process> processes_vector, string type) {
     ofstream output;
     output.open(output_name.str().c_str());
     if( !output.good() ) {
-        cout << "Output file is not good enough, my soldier!" << endl;
+        cout << "Output file is not good enough!\n" << endl;
         return;
     }
     for (auto task: processes_vector) {
